@@ -1,20 +1,29 @@
-import React from "react";
+import React, { useMemo, useState } from "react";
 import Button from "@/components/Button";
 import { View, Text, StyleSheet, TextInput, Image } from "react-native";
-import { Stack } from "expo-router";
+import { Stack, useLocalSearchParams } from "expo-router";
+import products from "@assets/data/products";
 import { defaultPizzaImage } from "@/components/ProductListItem";
-import { useState } from "react";
 import Colors from "@constants/Colors";
 import * as ImagePicker from "expo-image-picker";
 
 const CreateProductScreen = () => {
-  const [name, setName] = useState("");
-  const [price, setPrice] = useState("");
+  const { id } = useLocalSearchParams();
+  const isUpdating = !!id;
+
+  const product = useMemo(() => {
+    return isUpdating
+      ? products.find((product) => product.id.toString() === id)
+      : null;
+  }, [isUpdating, id]);
+
+  // Initialize states with conditional values
+  const [name, setName] = useState(product?.name || "");
+  const [price, setPrice] = useState(product ? String(product.price) : "");
   const [errors, setErrors] = useState("");
-  const [image, setImage] = useState<string | null>(null);
+  const [image, setImage] = useState<string | null>(product?.image || null);
 
   const pickImage = async () => {
-    // No permissions request is necessary for launching the image library
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
@@ -48,6 +57,14 @@ const CreateProductScreen = () => {
     return true;
   };
 
+  const onSubmit = () => {
+    if (isUpdating) {
+      onUpdate();
+    } else {
+      onCreate();
+    }
+  };
+
   const onCreate = () => {
     if (!validateInput()) {
       return;
@@ -56,9 +73,19 @@ const CreateProductScreen = () => {
     resetFields();
   };
 
+  const onUpdate = () => {
+    if (!validateInput()) {
+      return;
+    }
+    console.warn("Updating Product", name);
+    resetFields();
+  };
+
   return (
     <View style={styles.container}>
-      <Stack.Screen options={{ title: "Create Product" }} />
+      <Stack.Screen
+        options={{ title: isUpdating ? "Update Product" : "Create Product" }}
+      />
       <Image
         source={{ uri: image || defaultPizzaImage }}
         style={styles.image}
@@ -72,19 +99,20 @@ const CreateProductScreen = () => {
       <TextInput
         value={name}
         onChangeText={setName}
-        placeholder="Name"
+        placeholder="name"
         style={styles.input}
       />
       <Text style={styles.label}>Price</Text>
       <TextInput
         value={price}
         onChangeText={setPrice}
-        placeholder="9.99"
+        placeholder="price"
         style={styles.input}
         keyboardType="numeric"
       />
       <Text style={{ color: "red" }}>{errors} </Text>
-      <Button onPress={onCreate} text="create" />
+      <Button onPress={onSubmit} text={isUpdating ? "Update" : "Create"} />
+      {isUpdating && <Text style={styles.textBtn}>Delete</Text>}
     </View>
   );
 };
