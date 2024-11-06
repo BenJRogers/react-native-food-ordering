@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import Button from "@/components/Button";
-import { View, Text, StyleSheet, TextInput, Image } from "react-native";
+import { View, Text, StyleSheet, TextInput, Image, Alert } from "react-native";
 import { Stack, useLocalSearchParams } from "expo-router";
 import products from "@assets/data/products";
 import { defaultPizzaImage } from "@/components/ProductListItem";
@@ -81,6 +81,17 @@ const CreateProductScreen = () => {
     resetFields();
   };
 
+  const onDelete = () => {
+    console.warn("Deleted!");
+  };
+
+  const confirmDelete = () => {
+    Alert.alert("Confirm", "Are you sure you want to delete this product", [
+      { text: "Cancle" },
+      { text: "Delete", style: "destructive", onPress: onDelete },
+    ]);
+  };
+
   return (
     <View style={styles.container}>
       <Stack.Screen
@@ -112,7 +123,14 @@ const CreateProductScreen = () => {
       />
       <Text style={{ color: "red" }}>{errors} </Text>
       <Button onPress={onSubmit} text={isUpdating ? "Update" : "Create"} />
-      {isUpdating && <Text style={styles.textBtn}>Delete</Text>}
+      {isUpdating && (
+        <Text
+          onPress={confirmDelete}
+          style={[styles.textBtn, { color: "red" }]}
+        >
+          Delete
+        </Text>
+      )}
     </View>
   );
 };
