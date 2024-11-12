@@ -36,7 +36,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     backgroundColor: "white",
-    padding: 16,
+    padding: 14,
     borderRadius: 8,
   },
   idCopy: {
