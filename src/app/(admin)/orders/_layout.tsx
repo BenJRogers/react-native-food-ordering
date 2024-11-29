@@ -4,9 +4,9 @@ export default function OrderLayout() {
   return (
     <Stack>
       <Stack.Screen
-        name="index"
+        name="list"
         options={{
-          headerTitle: "Orders",
+          headerShown: false,
         }}
       />
     </Stack>
