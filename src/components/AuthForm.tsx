@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, StyleSheet } from "react-native";
 import Button from "@components/Button";
+import { AuthForm as AuthFormProps } from "@/types";
 
-const AuthForm = ({
+const AuthForm: React.FC<AuthFormProps> = ({
   title,
   buttonText,
   onSubmit,
@@ -13,13 +14,14 @@ const AuthForm = ({
   const [password, setPassword] = useState("");
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const validateEmail = (email) => {
+  const validateEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     let valid = true;
 
     if (!validateEmail(email)) {
@@ -37,9 +39,16 @@ const AuthForm = ({
     }
 
     if (valid) {
-      onSubmit(email, password);
-      setEmail("");
-      setPassword("");
+      try {
+        setLoading(true);
+        await onSubmit(email, password);
+        setEmail("");
+        setPassword("");
+      } catch (error) {
+        console.error("Submission failed:", error);
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
@@ -68,7 +77,11 @@ const AuthForm = ({
         <Text style={styles.errorText}>{passwordError}</Text>
       ) : null}
 
-      <Button text={buttonText} onPress={handleSubmit} />
+      <Button
+        text={loading ? `${buttonText}...` : buttonText}
+        onPress={handleSubmit}
+        disabled={loading}
+      />
 
       <Text style={styles.switchText} onPress={onSwitchScreen}>
         {onSwitchScreenText}
