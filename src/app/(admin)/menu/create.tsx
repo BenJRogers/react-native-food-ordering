@@ -1,20 +1,43 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Button from "@/components/Button";
 import { View, Text, StyleSheet, TextInput, Image, Alert } from "react-native";
-import { Stack, useLocalSearchParams } from "expo-router";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import products from "@assets/data/products";
 import { defaultPizzaImage } from "@/components/ProductListItem";
 import Colors from "@constants/Colors";
 import * as ImagePicker from "expo-image-picker";
+import {
+  useInsertProduct,
+  useProduct,
+  useUpdateProduct,
+  useDeleteProduct,
+} from "@/app/api/products";
 
 const CreateProductScreen = () => {
-  const { id } = useLocalSearchParams();
+  const { id: idString } = useLocalSearchParams();
+  const id = parseFloat(
+    typeof idString === "string" ? idString : idString?.[0],
+  );
+
   const isUpdating = !!id;
 
+  const { mutate: insertProduct } = useInsertProduct();
+  const { mutate: updateProduct } = useUpdateProduct();
+  const { data: updatingProduct } = useProduct(id);
+  const { mutate: deleteProduct } = useDeleteProduct();
+
+  const router = useRouter();
+
+  useEffect(() => {
+    if (updatingProduct) {
+      setName(updatingProduct.name);
+      setImage(updatingProduct.image);
+      setPrice(updatingProduct.price.toString());
+    }
+  }, [updatingProduct]);
+
   const product = useMemo(() => {
-    return isUpdating
-      ? products.find((product) => product.id.toString() === id)
-      : null;
+    return isUpdating ? products.find((product) => product.id === id) : null;
   }, [isUpdating, id]);
 
   // Initialize states with conditional values
@@ -69,20 +92,39 @@ const CreateProductScreen = () => {
     if (!validateInput()) {
       return;
     }
-    console.warn("Creating Product", name);
-    resetFields();
+
+    insertProduct(
+      { name, image, price: parseFloat(price) },
+      {
+        onSuccess: () => {
+          resetFields();
+          router.back();
+        },
+      },
+    );
   };
 
   const onUpdate = () => {
     if (!validateInput()) {
       return;
     }
-    console.warn("Updating Product", name);
-    resetFields();
+    updateProduct(
+      { id, name, image, price },
+      {
+        onSuccess: () => {
+          resetFields();
+          router.replace("/(admin)");
+        },
+      },
+    );
   };
 
   const onDelete = () => {
-    console.warn("Deleted!");
+    deleteProduct(id, {
+      onSuccess: () => {
+        router.replace("/(admin)");
+      },
+    });
   };
 
   const confirmDelete = () => {

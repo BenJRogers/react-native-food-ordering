@@ -1,34 +1,36 @@
 import React from "react";
 import { Stack, useLocalSearchParams } from "expo-router";
-import { useState } from "react";
 import { PizzaSize } from "@/types";
 import { View, Text, StyleSheet, Image, Pressable } from "react-native";
-import products from "@assets/data/products";
 import { defaultPizzaImage } from "@/components/ProductListItem";
-import { useCart } from "@/providers/CartProvider";
-import { router, Link } from "expo-router";
+import { Link } from "expo-router";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import Colors from "@constants/Colors";
-
-const sizes: PizzaSize[] = ["S", "M", "L", "XL"];
+import { useProduct } from "@/app/api/products";
+import { ActivityIndicator } from "react-native";
 
 const ProductDetailsScreen = () => {
-  const { id } = useLocalSearchParams();
-  const { addItem } = useCart();
+  const { id: idString } = useLocalSearchParams();
+  const id = parseFloat(typeof idString === "string" ? idString : idString[0]);
 
-  const [selectedSize, setSelectedSize] = useState<PizzaSize>("M");
+  const { data: product, error, isLoading } = useProduct(id);
 
-  const product = products.find((product) => product.id.toString() === id);
-
-  const addToCart = () => {
-    if (!product) return;
-    addItem(product, selectedSize);
-    router.push("/cart");
-  };
-
-  if (!product) {
-    return <Text> Sorry product not found</Text>;
+  if (isLoading) {
+    return (
+      <ActivityIndicator
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      />
+    );
   }
+
+  if (error) {
+    return <Text> Failed to return the product</Text>;
+  }
+
   return (
     <View style={styles.container}>
       <Stack.Screen
