@@ -11,7 +11,7 @@ import {
   useProduct,
   useUpdateProduct,
   useDeleteProduct,
-} from "@/app/api/products";
+} from "@/api/products";
 
 const CreateProductScreen = () => {
   const { id: idString } = useLocalSearchParams();

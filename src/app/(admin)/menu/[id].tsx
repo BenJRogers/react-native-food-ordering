@@ -6,7 +6,7 @@ import { defaultPizzaImage } from "@/components/ProductListItem";
 import { Link } from "expo-router";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import Colors from "@constants/Colors";
-import { useProduct } from "@/app/api/products";
+import { useProduct } from "@/api/products";
 import { ActivityIndicator } from "react-native";
 
 const ProductDetailsScreen = () => {

@@ -7,7 +7,7 @@ import { defaultPizzaImage } from "@/components/ProductListItem";
 import Button from "@components/Button";
 import { useCart } from "@/providers/CartProvider";
 import { router } from "expo-router";
-import { useProduct } from "@/app/api/products";
+import { useProduct } from "@/api/products";
 import { ActivityIndicator } from "react-native";
 
 const sizes: PizzaSize[] = ["S", "M", "L", "XL"];

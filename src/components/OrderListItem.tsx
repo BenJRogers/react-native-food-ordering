@@ -1,29 +1,28 @@
-import React from "react";
 import { View, Text, StyleSheet, Pressable } from "react-native";
-import { Link, useSegments } from "expo-router";
-import { Order } from "@/types";
+import React from "react";
+import { Order, Tables } from "../types";
 import relativeTime from "dayjs/plugin/relativeTime";
 import dayjs from "dayjs";
-
-type OrderItemProps = {
-  order: Order;
-};
+import { Link, useSegments } from "expo-router";
 
 dayjs.extend(relativeTime);
 
-const OrderList = ({ order }: OrderItemProps) => {
+type OrderListItemProps = {
+  order: Tables<"orders">;
+};
+
+const OrderListItem = ({ order }: OrderListItemProps) => {
   const segments = useSegments();
 
   return (
     <Link href={`/${segments[0]}/orders/${order.id}`} asChild>
       <Pressable style={styles.container}>
         <View>
-          <Text style={styles.idCopy}>Order #{order.id}</Text>
-          <Text style={styles.timeCopy}>
-            {dayjs(order.created_at).fromNow()}
-          </Text>
+          <Text style={styles.title}>Order #{order.id}</Text>
+          <Text style={styles.time}>{dayjs(order.created_at).fromNow()}</Text>
         </View>
-        <Text style={styles.statusCopy}>{order.status}</Text>
+
+        <Text style={styles.status}>{order.status}</Text>
       </Pressable>
     </Link>
   );
@@ -31,28 +30,23 @@ const OrderList = ({ order }: OrderItemProps) => {
 
 const styles = StyleSheet.create({
   container: {
-    display: "flex",
+    backgroundColor: "white",
+    padding: 10,
+    borderRadius: 10,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: "white",
-    padding: 14,
-    borderRadius: 8,
   },
-  idCopy: {
+  title: {
     fontWeight: "bold",
-    fontSize: 14,
-    marginBottom: 6,
+    marginVertical: 5,
   },
-  timeCopy: {
-    color: "grey",
-    fontSize: 14,
+  time: {
+    color: "gray",
   },
-
-  statusCopy: {
-    fontWeight: "bold",
-    fontSize: 14,
+  status: {
+    fontWeight: "500",
   },
 });
 
-export default OrderList;
+export default OrderListItem;
