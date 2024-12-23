@@ -25,7 +25,15 @@ export default function OrderDetailsScreen() {
   };
 
   if (isLoading) {
-    return <ActivityIndicator />;
+    return (
+      <ActivityIndicator
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      />
+    );
   }
   if (error || !order) {
     return <Text>Failed to fetch</Text>;

@@ -6,7 +6,15 @@ export default function OrdersScreen() {
   const { data: orders, isLoading, error } = useMyOrderList();
 
   if (isLoading) {
-    return <ActivityIndicator />;
+    return (
+      <ActivityIndicator
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      />
+    );
   }
   if (error) {
     return <Text>Failed to fetch</Text>;
