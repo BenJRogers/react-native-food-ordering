@@ -31,28 +31,51 @@ export default function AuthProvider({ children }: PropsWithChildren) {
 
   useEffect(() => {
     const fetchSession = async () => {
-      const {
-        data: { session },
-        error,
-      } = await supabase.auth.getSession();
-      setSession(session);
-      if (error) Alert.alert(error.message);
+      setLoading(true);
+      try {
+        const {
+          data: { session },
+          error,
+        } = await supabase.auth.getSession();
+        if (error) Alert.alert(error.message);
+        setSession(session);
 
-      if (session) {
-        const { data } = await supabase
-          .from("profiles")
-          .select("*")
-          .eq("id", session.user.id)
-          .single();
-        setProfile(data || null);
+        if (session) {
+          const { data } = await supabase
+            .from("profiles")
+            .select("*")
+            .eq("id", session.user.id)
+            .single();
+          setProfile(data || null);
+        }
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     fetchSession();
-    supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
+
+    const { data } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_OUT') {
+        setSession(null);
+        setProfile(null);
+        setLoading(false);
+      } else {
+        setSession(session);
+        if (session) {
+          const { data } = await supabase
+            .from("profiles")
+            .select("*")
+            .eq("id", session.user.id)
+            .single();
+          setProfile(data || null);
+        }
+      }
     });
+
+    return () => {
+      data?.subscription.unsubscribe();
+    };
   }, []);
 
   return (
