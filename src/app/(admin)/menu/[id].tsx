@@ -1,6 +1,5 @@
 import React from "react";
 import { Stack, useLocalSearchParams } from "expo-router";
-import { PizzaSize } from "@/types";
 import { View, Text, StyleSheet, Image, Pressable } from "react-native";
 import { defaultPizzaImage } from "@/components/ProductListItem";
 import { Link } from "expo-router";
@@ -53,15 +52,15 @@ const ProductDetailsScreen = () => {
           ),
         }}
       />
-      <Stack.Screen options={{ title: product.name }} />
+      <Stack.Screen options={{ title: product?.name }} />
       <RemoteImage
         path={product?.image}
         fallback={defaultPizzaImage}
         style={styles.image}
       />
       <View style={styles.textContainer}>
-        <Text style={styles.name}>{product.name}</Text>
-        <Text style={styles.price}>${product.price}</Text>
+        <Text style={styles.name}>{product?.name}</Text>
+        <Text style={styles.price}>${product?.price}</Text>
       </View>
     </View>
   );
