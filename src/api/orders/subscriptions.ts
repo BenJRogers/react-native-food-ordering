@@ -10,8 +10,7 @@ export const useInsertOrderSubscription = () => {
       .on(
         "postgres_changes",
         { event: "INSERT", schema: "public", table: "orders" },
-        (payload) => {
-          console.log("Change received!", payload);
+        () => {
           queryClient.invalidateQueries(["orders"]);
         },
       )
@@ -35,8 +34,7 @@ export const useUpdateOrderSubscription = (id: number) => {
           table: "orders",
           filter: `id=eq.${id}`,
         },
-        (payload) => {
-          console.log("Change received!", payload);
+        () => {
           queryClient.invalidateQueries(["orders", id]);
         },
       )
